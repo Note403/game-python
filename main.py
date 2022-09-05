@@ -15,7 +15,7 @@ class Game:
         self.player = Player()
 
         self.running = True
-        self.clock = pygame.time.Clock
+        self.clock = pygame.time.Clock()
 
         self.sprites = pygame.sprite.Group()
         self.sprites.add(self.player)
@@ -30,7 +30,11 @@ class Game:
                     keys_pressed = pygame.key.get_pressed()
                     self.player.handle_movement(keys_pressed)
 
+            self.sprites.update()
+            self.display.fill((0, 0, 0))
+            self.sprites.draw(self.display)
             pygame.display.flip()
+            self.clock.tick(60)
 
         sys.exit()
 

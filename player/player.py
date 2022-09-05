@@ -2,23 +2,24 @@ import pygame
 
 
 class Player(pygame.sprite.Sprite):
-    def __init(self, width, height):
+    def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 # test
-        # self.image = pygame.Surface()
-        self.position = self.image.get_rect([20, 20])
+        self.image = pygame.image.load('assets/player_sprite.png').convert().subsurface(0, 38, 16, 16)
+        self.image = pygame.transform.scale(self.image, (36, 36))
+        self.rect = self.image.get_rect()
 
         self.velocity = 3
 
     def handle_movement(self, keys_pressed):
         if keys_pressed[pygame.K_w]:
-            self.position.y -= self.velocity
+            self.rect.y -= self.velocity
 
         if keys_pressed[pygame.K_s]:
-            self.position.y += self.velocity
+            self.rect.y += self.velocity
 
         if keys_pressed[pygame.K_a]:
-            self.position.x -= self.velocity
+            self.rect.x -= self.velocity
 
         if keys_pressed[pygame.K_d]:
-            self.position.x += self.velocity
+            self.rect.x += self.velocity
