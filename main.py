@@ -1,18 +1,24 @@
 import sys
 
 import pygame
+from player.player import Player
 
 pygame.init()
 
 
 class Game:
-    size = height, width = 720, 480
-    display = pygame.display.set_mode(size)
-    player = pygame.Rect(0, 0, 50, 100)
-    running = True
-
     def __init__(self):
         pygame.display.set_caption("GAME")
+        self.size = height, width = 720, 480
+        self.display = pygame.display.set_mode(self.size)
+
+        self.player = Player()
+
+        self.running = True
+        self.clock = pygame.time.Clock
+
+        self.sprites = pygame.sprite.Group()
+        self.sprites.add(self.player)
 
     def game(self):
         while self.running:
@@ -20,7 +26,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
 
-            pygame.draw.rect(self.display, (0, 200, 0), self.player)
+                if event.type == pygame.KEYDOWN:
+                    keys_pressed = pygame.key.get_pressed()
+                    self.player.handle_movement(keys_pressed)
+
             pygame.display.flip()
 
         sys.exit()
