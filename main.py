@@ -27,11 +27,11 @@ class Game:
 
         self.fps_font = pygame.font.SysFont('Arial', 15)
 
-        #self.background = pygame.image.load('assets/background.png')
-        # self.background = pygame.transform.scale(
-        #    self.background,
-        #    (self.background.get_width() * 2.5, self.background.get_height() * 2.5)
-        # )
+        self.background = pygame.image.load('assets/background.png')
+        self.background = pygame.transform.scale(
+           self.background,
+           (self.background.get_width() * 2.5, self.background.get_height() * 2.5)
+        )
 
         self.bg_data = {
             'min_x': 0 - (self.display.get_width() / 2)
@@ -82,10 +82,10 @@ class Game:
             player = self.player.get_loc()
             self.enemy.move_towards_player(player, pygame.time.get_ticks())
             self.sprites.update()
-            # self.draw_camera()
+            self.draw_camera()
 
-            # for i in range(self.player.lifes):
-            #    self.display.blit(self.player.heart_sprite, (i * 20, 0))
+            for i in range(self.player.lifes):
+                self.display.blit(self.player.heart_sprite, (i * 20, 0))
 
             self.display.blit(self.fps_font.render(
                 str(self.clock.get_fps()), False, (255, 255, 255)), (0, 30))

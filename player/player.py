@@ -8,8 +8,8 @@ class Player(pygame.sprite.Sprite):
             'assets/player_sprite.png').convert()
         self.image = self.sprite_img.subsurface(0, 38, 16, 16)
         self.image = pygame.transform.scale(self.image, (36, 36))
-        #self.heart_sprite = pygame.image.load('assets/heart.png').convert()
-        #self.heart_sprite = pygame.transform.scale(self.heart_sprite, (20, 20))
+        self.heart_sprite = pygame.image.load('assets/heart.png').convert()
+        self.heart_sprite = pygame.transform.scale(self.heart_sprite, (20, 20))
         self.rect = self.image.get_rect()
 
         self.lifes = 4
@@ -166,5 +166,5 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (36, 36))
 
     def get_loc(self):
-        player_location = (self.rect.x, self.rect.y)
+        player_location = (self.f_x, self.f_y)
         return player_location
