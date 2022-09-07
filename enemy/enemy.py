@@ -7,6 +7,7 @@ VELOCITY = 5
 LERP_FACTOR = 0.05
 minimum_distance = 25
 maximum_distance = 100
+#
 
 
 class Enemy(pygame.sprite.Sprite):
