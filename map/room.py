@@ -6,7 +6,8 @@ class Room:
         self.x = x
         self.y = y
 
-        self.sprite_img = pygame.image.load('assets/dungeon_tiles.png').convert()
+        self.sprite_img = pygame.image.load(
+            'assets/dungeon_tiles.png').convert()
         self.floor = self.sprite_img.subsurface(31, 31, 82, 93)
         self.floor = pygame.transform.scale(self.floor, (350, 350))
 
@@ -58,7 +59,8 @@ class Room:
     def get_top_wall_cords(self, display):
         last_x = (display.get_width() / 2) - (self.floor.get_width() / 2)
         final_x = last_x + self.floor.get_width()
-        wall_y = (display.get_height() / 2) - (self.floor.get_height() / 2) - (self.wall_front.get_height() / 2)
+        wall_y = (display.get_height() / 2) - (self.floor.get_height() /
+                                               2) - (self.wall_front.get_height() / 2)
 
         cords = []
 
@@ -77,7 +79,8 @@ class Room:
     def get_side_wall_cords(self, display):
         last_y = (display.get_height() / 2) - (self.floor.get_height() / 2)
         final_y = last_y + self.floor.get_height() - (self.wall_front.get_height() / 2)
-        wall_x = (display.get_width() / 2) - (self.floor.get_width() / 2) - (self.wall_side.get_width() / 2)
+        wall_x = (display.get_width() / 2) - \
+            (self.floor.get_width() / 2) - (self.wall_side.get_width() / 2)
 
         cords = []
 
