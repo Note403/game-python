@@ -12,20 +12,22 @@ pygame.key.set_repeat(True)
 
 class Game:
     def __init__(self):
-        pygame.display.set_caption("GAME")
+        pygame.display.set_caption("THE CHAMBER OF DEATH")
         self.size = height, width = 720, 480
         self.display = pygame.display.set_mode(self.size)
 
+        self.game_over_font = pygame.font.SysFont('Arial', 45, True)
+        self.game_over = self.game_over_font.render('GAME OVER', False, (200, 50, 50))
+
         self.map_gen = MapGenerator()
         self.player = Player(width, height)
-        self.enemy = Enemy()
 
         self.running = True
+
         self.clock = pygame.time.Clock()
 
         self.sprites = pygame.sprite.Group()
         self.sprites.add(self.player)
-        self.sprites.add(self.enemy)
 
         self.fps_font = pygame.font.SysFont('Arial', 15)
 
@@ -58,39 +60,65 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.running = False
+                    sys.exit()
 
                 keys_pressed = pygame.key.get_pressed()
 
                 if self.player.in_attack:
                     self.player.handle_attack(
-                        keys_pressed, pygame.time.get_ticks())
+                        keys_pressed, pygame.time.get_ticks(), self.room)
 
                 if event.type == pygame.KEYDOWN:
                     self.player.handle_movement(keys_pressed, pygame.time.get_ticks(), self.room, self.display)
 
+            door_hit = self.map_gen.player_in_door(self.player, self.room)
+
+            if door_hit != False:
+                if door_hit[0] > ((self.display.get_width() / 2) + 32):
+                    self.map_gen.room_atm = [self.map_gen.room_atm[0] + 1, self.map_gen.room_atm[1]]
+                    self.room = self.map_gen.get_room()
+                    self.player.f_x = self.display.get_width() / 2
+                    self.player.f_y = self.display.get_height() / 2
+                elif door_hit[0] < ((self.display.get_width() / 2) - 32):
+                    self.map_gen.room_atm = [self.map_gen.room_atm[0] - 1, self.map_gen.room_atm[1]]
+                    self.room = self.map_gen.get_room()
+                    self.player.f_x = self.display.get_width() / 2
+                    self.player.f_y = self.display.get_height() / 2
+                elif door_hit[1] < (self.display.get_height() / 2):
+                    self.map_gen.room_atm = [self.map_gen.room_atm[0], self.map_gen.room_atm[1] - 1]
+                    self.room = self.map_gen.get_room()
+                    self.player.f_x = self.display.get_width() / 2
+                    self.player.f_y = self.display.get_height() / 2
+                elif door_hit[1] > (self.display.get_height() / 2):
+                    self.map_gen.room_atm = [self.map_gen.room_atm[0], self.map_gen.room_atm[1] + 1]
+                    self.room = self.map_gen.get_room()
+                    self.player.f_x = self.display.get_width() / 2
+                    self.player.f_y = self.display.get_height() / 2
+
+            self.player.got_hit(self.room, pygame.time.get_ticks())
+
+            if self.player.health <= 0:
+                sys.exit()
+
             player = self.player.get_loc()
-            self.enemy.move_towards_player(player, pygame.time.get_ticks())
+
+            for enemy in self.room.enemies:
+                enemy.move_towards_player(player, pygame.time.get_ticks())
+
+            for enemy in self.room.enemies:
+                self.display.blit(enemy.image, enemy.rect)
+
             self.display.fill((0, 0, 0))
             self.sprites.update()
             self.room.draw(self.display)
 
             self.display.blit(self.player.image, (self.player.f_x, self.player.f_y))
-            self.display.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
 
             for i in range(self.player.health):
                 self.display.blit(self.player.heart_sprite, (i * 20, 0))
 
-            self.display.blit(self.fps_font.render(
-                str(self.clock.get_fps()), False, (255, 255, 255)), (0, 30))
-            self.display.blit(self.fps_font.render(
-                "PLAYER_X: " + str(self.player.f_x), False, (255, 255, 255)), (0, 50))
-            self.display.blit(self.fps_font.render(
-                "PLAYER_Y: " + str(self.player.f_y), False, (255, 255, 255)), (0, 600))
             pygame.display.flip()
             self.clock.tick(60)
-
-        sys.exit()
 
 
 game = Game()

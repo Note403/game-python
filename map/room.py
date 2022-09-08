@@ -1,4 +1,7 @@
 import pygame
+import random
+
+from enemy.enemy import Enemy
 
 
 class Room:
@@ -10,11 +13,10 @@ class Room:
         self.floor = self.sprite_img.subsurface(31, 31, 82, 93)
         self.floor = pygame.transform.scale(self.floor, (350, 350))
 
-        self.wall_front = self.sprite_img.subsurface(32, 211, 31, 32)
-        self.wall_front = pygame.transform.scale(self.wall_front, (100, 100))
+        self.door = self.sprite_img.subsurface(192, 212, 16, 16)
+        self.door = pygame.transform.scale(self.door, (32, 32))
 
-        self.wall_side = self.sprite_img.subsurface(140, 160, 17, 47)
-        self.wall_side = pygame.transform.scale(self.wall_side, (75, 100))
+        self.enemies_alive = 0
 
         self.doors = {
             'top': 0,
@@ -23,7 +25,15 @@ class Room:
             'right': 0
         }
 
+        self.door_cords = []
+
+        self.enemies = []
+
+        self.boss_room = False
+        self.entered = False
+
         self.set_doors(room_layout)
+        self.spawn_enemies()
 
     def set_doors(self, room_layout):
         if self.x > 0:
@@ -50,45 +60,64 @@ class Room:
         display.blit(
             self.floor,
             (
-                (display.get_width() / 2) - (self.floor.get_width() / 2),
+                (display.get_width() / 2) + - (self.floor.get_width() / 2),
                 (display.get_height() / 2) - (self.floor.get_height() / 2)
             )
         )
 
-    def get_top_wall_cords(self, display):
-        last_x = (display.get_width() / 2) - (self.floor.get_width() / 2)
-        final_x = last_x + self.floor.get_width()
-        wall_y = (display.get_height() / 2) - (self.floor.get_height() / 2) - (self.wall_front.get_height() / 2)
+        self.get_door_cords(display)
 
-        cords = []
+        for cords in self.door_cords:
+            display.blit(self.door, cords)
 
-        while last_x < final_x:
-            dist_left = self.floor.get_width() - (len(cords) * 100)
+        for enemy in self.enemies:
+            display.blit(enemy.image, enemy.rect)
 
-            if dist_left >= 100:
-                cords.append([last_x, wall_y])
-                last_x += 100
-            else:
-                cords.append([last_x - dist_left, wall_y])
-                last_x += dist_left
+    def get_door_cords(self, display):
 
-        return cords
+        display_mid = [display.get_width() / 2, display.get_height() / 2]
 
-    def get_side_wall_cords(self, display):
-        last_y = (display.get_height() / 2) - (self.floor.get_height() / 2)
-        final_y = last_y + self.floor.get_height() - (self.wall_front.get_height() / 2)
-        wall_x = (display.get_width() / 2) - (self.floor.get_width() / 2) - (self.wall_side.get_width() / 2)
+        if self.doors['top']:
+            self.door_cords.append(
+                [
+                    display_mid[0] - (self.door.get_width() / 2),
+                    display_mid[1] - (self.floor.get_height() / 2) + 10
+                ]
+            )
 
-        cords = []
+        if self.doors['bottom']:
+            self.door_cords.append(
+                [
+                    display_mid[0] - (self.door.get_width() / 2),
+                    display_mid[1] + (self.floor.get_height() / 2) - self.door.get_height() - 40
+                ]
+            )
 
-        while last_y < final_y:
-            dist_left = self.floor.get_height() - (len(cords) * self.wall_side.get_height())
+        if self.doors['right']:
+            self.door_cords.append(
+                [
+                    display_mid[0] + (self.floor.get_width() / 2) - self.door.get_width() - 10,
+                    display_mid[1] - (self.door.get_height() / 2)
+                ]
+            )
 
-            if dist_left >= 100:
-                cords.append([wall_x, last_y])
-                last_y += self.wall_side.get_height()
-            else:
-                cords.append([wall_x, last_y - dist_left])
-                last_y += dist_left
+        if self.doors['left']:
+            self.door_cords.append(
+                [
+                    display_mid[0] - (self.floor.get_width() / 2) + self.door.get_width() - 20,
+                    display_mid[1] - (self.door.get_height() / 2)
+                ]
+            )
 
-        return cords
+    def spawn_enemies(self):
+        if self.entered:
+            return
+
+        self.enemies_alive = random.randint(2, 4)
+
+        for i in range(self.enemies_alive):
+            self.enemies.append(Enemy(self, 720, 480))
+
+    def remove_enemy(self, enemy):
+        self.enemies.remove(enemy)
+        self.enemies_alive -= 1

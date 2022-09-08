@@ -1,5 +1,6 @@
 import math
 import pygame
+import random
 
 VELOCITY = 5
 LERP_FACTOR = 0.05
@@ -9,14 +10,27 @@ maximum_distance = 100
 
 
 class Enemy(pygame.sprite.Sprite):
-    speed = 2
+    speed = 1.1
 
-    def __init__(self):
+    def __init__(self, room, s_width, s_height):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(
             'assets/zombie.png').convert().subsurface(16, 399, 47, 47)
         self.image = pygame.transform.scale(self.image, (38, 38))
         self.rect = self.image.get_rect()
+
+        self.health = 3
+
+        self.rect.x = random.randint(
+            (s_width / 2) - (room.floor.get_width() / 2) + 30,
+            (s_width / 2) + (room.floor.get_width() / 2) - 60
+        )
+
+        self.rect.y = random.randint(
+            (s_height / 2) - (room.floor.get_height() / 2) + 30,
+            (s_height / 2) + (room.floor.get_height() / 2) - 100
+        )
+
         self.animation_index = 0
         self.last_change_tick = 0
 
