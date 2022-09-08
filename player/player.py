@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         self.health = 4
+        self.range = 50
 
         self.f_x = (screen_width / 2) - (self.width / 2)
         self.f_y = (screen_height / 2) - (self.height / 2)
@@ -28,6 +29,7 @@ class Player(pygame.sprite.Sprite):
         self.last_direction = 's'
 
         self.last_attack = 0
+        self.last_hit = 0
         self.in_attack = False
 
         self.attack_sprites = {
@@ -61,33 +63,57 @@ class Player(pygame.sprite.Sprite):
         ]
 
     def handle_movement(self, keys_pressed, tick, room, display):
-        self.handle_attack(keys_pressed, tick)
-
-        min_x = (display.get_width() / 2) - (room.floor.get_width() / 2)
-        max_x = (display.get_width() / 2) + (room.floor.get_width() / 2)
+        self.handle_attack(keys_pressed, tick, room)
 
         if self.in_attack:
             return
 
+        room_rect = pygame.rect.Rect(
+            (display.get_width() / 2) - (room.floor.get_width() / 2) + 30,
+            (display.get_height() / 2) - (room.floor.get_height() / 2) + 30,
+            room.floor.get_width() - 60,
+            room.floor.get_height() - 100
+        )
+
         if keys_pressed[pygame.K_w]:
+            player_rect = pygame.rect.Rect(self.f_x, self.f_y - self.velocity, self.width, self.height)
+
+            if not room_rect.colliderect(player_rect):
+                return
+
             self.f_y -= self.velocity
 
             self.last_direction = 'w'
             self.animate('w', tick)
 
         if keys_pressed[pygame.K_s]:
+            player_rect = pygame.rect.Rect(self.f_x, self.f_y + self.velocity, self.width, self.height)
+
+            if not room_rect.colliderect(player_rect):
+                return
+
             self.f_y += self.velocity
 
             self.last_direction = 's'
             self.animate('s', tick)
 
         if keys_pressed[pygame.K_a]:
+            player_rect = pygame.rect.Rect(self.f_x - self.velocity, self.f_y, self.width, self.height)
+
+            if not room_rect.colliderect(player_rect):
+                return
+
             self.f_x -= self.velocity
 
             self.last_direction = 'a'
             self.animate('a', tick)
 
         if keys_pressed[pygame.K_d]:
+            player_rect = pygame.rect.Rect(self.f_x + self.velocity, self.f_y, self.width, self.height)
+
+            if not room_rect.colliderect(player_rect):
+                return
+
             self.f_x += self.velocity
 
             self.last_direction = 'd'
@@ -127,7 +153,7 @@ class Player(pygame.sprite.Sprite):
                 self.animation_index = 1
                 self.last_change_tick = tick
 
-    def handle_attack(self, keys_pressed, tick):
+    def handle_attack(self, keys_pressed, tick, room):
         if self.in_attack:
             if self.last_attack + 55 < tick:
                 self.in_attack = False
@@ -143,6 +169,27 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.transform.scale(self.image, (36, 36))
             self.in_attack = True
             self.last_attack = tick
+
+            hitbox_y = self.f_y
+            hitbox_x = self.f_x
+
+            if self.last_direction == 'w':
+                hitbox_y -= self.range
+            elif self.last_direction == 's':
+                hitbox_y += self.height
+            elif self.last_direction == 'd':
+                hitbox_x += self.width
+            elif self.last_direction == 'a':
+                hitbox_x -= self.width
+
+            hit_rect = pygame.rect.Rect(hitbox_x, hitbox_y, self.range, self.range)
+
+            for enemy in room.enemies:
+                if hit_rect.colliderect(enemy.rect):
+                    enemy.health -= 1
+
+                    if enemy.health <= 0:
+                        room.remove_enemy(enemy)
 
     def load_old_sprite(self):
         self.animation_index = 0
@@ -167,3 +214,17 @@ class Player(pygame.sprite.Sprite):
 
     def increase_health(self):
         self.health += 1
+
+    def got_hit(self, room, tick):
+        if self.last_hit + 1000 > tick:
+            return
+
+        player_rect = pygame.rect.Rect(self.f_x, self.f_y, self.width, self.height)
+
+        for enemy in room.enemies:
+            if player_rect.colliderect(enemy):
+                self.last_hit = tick
+                self.decrease_health()
+
+
+
