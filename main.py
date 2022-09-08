@@ -99,6 +99,10 @@ class Game:
             for i in range(self.player.health):
                 self.display.blit(self.player.heart_sprite, (i * 20, 0))
 
+            for i in range(self.enemyboss.health):
+                self.display.blit(
+                    self.enemyboss.heart_sprite, (i * 25, 430))
+
             self.display.blit(self.fps_font.render(
                 str(self.clock.get_fps()), False, (255, 255, 255)), (0, 30))
             self.display.blit(self.fps_font.render(

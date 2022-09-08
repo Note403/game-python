@@ -62,7 +62,6 @@ class Enemygirl(pygame.sprite.Sprite):
                     # print(self.rect.y)
                     self.checkY = self.rect.y
                     self.animate_enemy('down', tick)
-                    print('Geht Down')
 
                 # if self.checkX > self.rect.x:
                     # Geht Rechts
@@ -76,7 +75,6 @@ class Enemygirl(pygame.sprite.Sprite):
                 #    print('geht Link')
 
                 if dist > 20.0:
-                    print('follow')
                     dx, dy = dx / dist, dy / dist
                     self.rect.x += dx * self.speed
                     self.rect.y += dy * self.speed

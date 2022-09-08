@@ -16,6 +16,14 @@ class Enemyboss(pygame.sprite.Sprite):
         self.image = pygame.image.load(
             'assets/zombie_boss.png').convert().subsurface(73, 10, 20, 20)
         self.image = pygame.transform.scale(self.image, (80, 80))
+
+        self.heart_sprite = pygame.image.load(
+            'assets/heart_enemy.png').convert_alpha()
+        self.heart_sprite = pygame.transform.scale(self.heart_sprite, (24, 24))
+        self.rect = self.heart_sprite.get_rect()
+        self.rect.center = (720 / 2, 480 / 2)
+        self.health = 20
+
         self.rect = self.image.get_rect()
         self.animation_index = 0
         self.last_change_tick = 0
@@ -79,7 +87,6 @@ class Enemyboss(pygame.sprite.Sprite):
                     # print(self.rect.y)
                     self.checkY = self.rect.y
                     self.animate_enemy('down', tick)
-                    print('Geht Down')
 
                 # if self.checkX > self.rect.x:
                     # Geht Rechts
@@ -93,7 +100,6 @@ class Enemyboss(pygame.sprite.Sprite):
                 #    print('geht Link')
 
                 if dist > 20.0:
-                    print('follow')
                     dx, dy = dx / dist, dy / dist
                     self.rect.x += dx * self.speed
                     self.rect.y += dy * self.speed
@@ -119,3 +125,6 @@ class Enemyboss(pygame.sprite.Sprite):
             self.change_sprite_index(tick)
             self.image = self.animation_backwards[self.animation_index]
             self.image = pygame.transform.scale(self.image, (80, 80))
+
+    def decrease_health(self):
+        self.health -= 1
