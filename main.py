@@ -3,6 +3,8 @@ import sys
 import pygame
 from player.player import Player
 from enemy.enemy import Enemy
+from enemy.enemygirl import Enemygirl
+
 from map.map_generator import MapGenerator
 
 pygame.init()
@@ -19,6 +21,7 @@ class Game:
         self.map_gen = MapGenerator()
         self.player = Player(width, height)
         self.enemy = Enemy()
+        self.enemygirl = Enemygirl()
 
         self.running = True
         self.clock = pygame.time.Clock()
@@ -26,13 +29,14 @@ class Game:
         self.sprites = pygame.sprite.Group()
         self.sprites.add(self.player)
         self.sprites.add(self.enemy)
+        self.sprites.add(self.enemygirl)
 
         self.fps_font = pygame.font.SysFont('Arial', 15)
 
         self.background = pygame.image.load('assets/background.png')
         self.background = pygame.transform.scale(
-           self.background,
-           (self.background.get_width() * 2.5, self.background.get_height() * 2.5)
+            self.background,
+            (self.background.get_width() * 2.5, self.background.get_height() * 2.5)
         )
 
         self.bg_data = {
@@ -67,16 +71,23 @@ class Game:
                         keys_pressed, pygame.time.get_ticks())
 
                 if event.type == pygame.KEYDOWN:
-                    self.player.handle_movement(keys_pressed, pygame.time.get_ticks(), self.room, self.display)
+                    self.player.handle_movement(
+                        keys_pressed, pygame.time.get_ticks(), self.room, self.display)
 
             player = self.player.get_loc()
             self.enemy.move_towards_player(player, pygame.time.get_ticks())
+            self.enemygirl.move_towards_player(
+                player, pygame.time.get_ticks())
             self.display.fill((0, 0, 0))
             self.sprites.update()
             self.room.draw(self.display)
 
-            self.display.blit(self.player.image, (self.player.f_x, self.player.f_y))
-            self.display.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
+            self.display.blit(self.player.image,
+                              (self.player.f_x, self.player.f_y))
+            self.display.blit(self.enemy.image,
+                              (self.enemy.rect.x, self.enemy.rect.y))
+            self.display.blit(self.enemygirl.image,
+                              (self.enemygirl.rect.x, self.enemygirl.rect.y))
 
             for i in range(self.player.health):
                 self.display.blit(self.player.heart_sprite, (i * 20, 0))
