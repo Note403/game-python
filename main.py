@@ -3,6 +3,7 @@ import sys
 import pygame
 from player.player import Player
 from enemy.enemy import Enemy
+from map.map_generator import MapGenerator
 
 pygame.init()
 pygame.font.init()
@@ -15,7 +16,8 @@ class Game:
         self.size = height, width = 720, 480
         self.display = pygame.display.set_mode(self.size)
 
-        self.player = Player()
+        self.map_gen = MapGenerator()
+        self.player = Player(width, height)
         self.enemy = Enemy()
 
         self.running = True
@@ -43,28 +45,17 @@ class Game:
         self.bg_max_x = self.bg_min_x + self.display.get_width()
         self.bg_max_y = self.bg_min_y + self.display.get_height()
 
+        self.room = None
+
         self.icon = pygame.image.load('assets/icon.gif')
         pygame.display.set_icon(self.icon)
 
-    def draw_camera(self):
-        if (self.player.f_x - (self.display.get_width() / 2)) <= self.bg_min_x:
-            bg_x = 0
-
-            if self.player.f_x >= self.bg_min_x:
-                player_x = (self.display.get_width() / 2) + self.player.f_x
-            else:
-                player_x = self.bg_min_x
-                self.player.f_x = self.bg_min_x + 1
-        else:
-            bg_x = 0 - self.player.f_x
-            player_x = self.display.get_width() / 2
-
-        self.display.blit(self.background, (bg_x, 0 - self.player.f_y))
-        self.display.blit(self.player.image, [
-                          player_x, self.display.get_height() / 2])
-
     def game(self):
+        self.map_gen.generate_room_layout()
+
         while self.running:
+            self.room = self.map_gen.get_room()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -76,15 +67,18 @@ class Game:
                         keys_pressed, pygame.time.get_ticks())
 
                 if event.type == pygame.KEYDOWN:
-                    self.player.handle_movement(
-                        keys_pressed, pygame.time.get_ticks())
+                    self.player.handle_movement(keys_pressed, pygame.time.get_ticks(), self.room, self.display)
 
             player = self.player.get_loc()
             self.enemy.move_towards_player(player, pygame.time.get_ticks())
+            self.display.fill((0, 0, 0))
             self.sprites.update()
-            self.draw_camera()
+            self.room.draw(self.display)
 
-            for i in range(self.player.lifes):
+            self.display.blit(self.player.image, (self.player.f_x, self.player.f_y))
+            self.display.blit(self.enemy.image, (self.enemy.rect.x, self.enemy.rect.y))
+
+            for i in range(self.player.health):
                 self.display.blit(self.player.heart_sprite, (i * 20, 0))
 
             self.display.blit(self.fps_font.render(

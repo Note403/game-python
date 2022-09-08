@@ -1,6 +1,4 @@
-from ast import While
 import math
-from sqlite3 import threadsafety
 import pygame
 
 VELOCITY = 5
@@ -63,20 +61,20 @@ class Enemy(pygame.sprite.Sprite):
                 # Find direction vector (dx, dy) between enemy and player.
                 dx, dy = player[0] - self.rect.x, player[1] - self.rect.y
                 dist = math.hypot(dx, dy)
-                print(self.checkY)
-                print(self.rect.y)
+                #print(self.checkY)
+                #print(self.rect.y)
 
                 if self.checkY > self.rect.y:
                     # Geht hoch
                     self.checkY = self.rect.y
                     self.animate_enemy('up', tick)
-                    print('Geht up')
+                    #print('Geht up')
 
                 else:
                     # geht runter
                     self.checkY = self.rect.y
                     self.animate_enemy('down', tick)
-                    print('Geht Down')
+                    #print('Geht Down')
 
                 # if self.checkX > self.rect.x:
                     # Geht Rechts
