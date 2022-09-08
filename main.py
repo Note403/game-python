@@ -4,6 +4,7 @@ import pygame
 from player.player import Player
 from enemy.enemy import Enemy
 from enemy.enemygirl import Enemygirl
+from enemy.enemyboss import Enemyboss
 
 from map.map_generator import MapGenerator
 
@@ -22,6 +23,7 @@ class Game:
         self.player = Player(width, height)
         self.enemy = Enemy()
         self.enemygirl = Enemygirl()
+        self.enemyboss = Enemyboss()
 
         self.running = True
         self.clock = pygame.time.Clock()
@@ -30,6 +32,7 @@ class Game:
         self.sprites.add(self.player)
         self.sprites.add(self.enemy)
         self.sprites.add(self.enemygirl)
+        self.sprites.add(self.enemyboss)
 
         self.fps_font = pygame.font.SysFont('Arial', 15)
 
@@ -78,6 +81,8 @@ class Game:
             self.enemy.move_towards_player(player, pygame.time.get_ticks())
             self.enemygirl.move_towards_player(
                 player, pygame.time.get_ticks())
+            self.enemyboss.move_towards_player(
+                player, pygame.time.get_ticks())
             self.display.fill((0, 0, 0))
             self.sprites.update()
             self.room.draw(self.display)
@@ -88,6 +93,8 @@ class Game:
                               (self.enemy.rect.x, self.enemy.rect.y))
             self.display.blit(self.enemygirl.image,
                               (self.enemygirl.rect.x, self.enemygirl.rect.y))
+            self.display.blit(self.enemyboss.image,
+                              (self.enemyboss.rect.x, self.enemyboss.rect.y))
 
             for i in range(self.player.health):
                 self.display.blit(self.player.heart_sprite, (i * 20, 0))
