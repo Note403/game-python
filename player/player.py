@@ -2,20 +2,22 @@ import pygame
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, screen_width, screen_height):
         pygame.sprite.Sprite.__init__(self)
+        self.width = 36
+        self.height = 36
         self.sprite_img = pygame.image.load(
             'assets/player_sprite.png').convert()
         self.image = self.sprite_img.subsurface(0, 38, 16, 16)
-        self.image = pygame.transform.scale(self.image, (36, 36))
-        self.heart_sprite = pygame.image.load('assets/heart.png').convert()
-        self.heart_sprite = pygame.transform.scale(self.heart_sprite, (20, 20))
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        self.heart_sprite = pygame.image.load('assets/heart.png').convert_alpha()
+        self.heart_sprite = pygame.transform.scale(self.heart_sprite, (24, 24))
         self.rect = self.image.get_rect()
 
-        self.lifes = 4
+        self.health = 4
 
-        self.f_x = 0.0
-        self.f_y = 0.0
+        self.f_x = (screen_width / 2) - (self.width / 2)
+        self.f_y = (screen_height / 2) - (self.height / 2)
 
         self.velocity = 0.3
 
@@ -58,44 +60,35 @@ class Player(pygame.sprite.Sprite):
             self.sprite_img.subsurface(32, 38, 16, 16),
         ]
 
-    def handle_movement(self, keys_pressed, tick):
+    def handle_movement(self, keys_pressed, tick, room, display):
         self.handle_attack(keys_pressed, tick)
+
+        min_x = (display.get_width() / 2) - (room.floor.get_width() / 2)
+        max_x = (display.get_width() / 2) + (room.floor.get_width() / 2)
 
         if self.in_attack:
             return
 
         if keys_pressed[pygame.K_w]:
-            if keys_pressed[pygame.K_d] or keys_pressed[pygame.K_a]:
-                self.f_y -= self.velocity / 2
-            else:
-                self.f_y -= self.velocity
+            self.f_y -= self.velocity
 
             self.last_direction = 'w'
             self.animate('w', tick)
 
         if keys_pressed[pygame.K_s]:
-            if keys_pressed[pygame.K_d] or keys_pressed[pygame.K_a]:
-                self.f_y += self.velocity / 2
-            else:
-                self.f_y += self.velocity
+            self.f_y += self.velocity
 
             self.last_direction = 's'
             self.animate('s', tick)
 
         if keys_pressed[pygame.K_a]:
-            if keys_pressed[pygame.K_s] or keys_pressed[pygame.K_w]:
-                self.f_x -= self.velocity / 2
-            else:
-                self.f_x -= self.velocity
+            self.f_x -= self.velocity
 
             self.last_direction = 'a'
             self.animate('a', tick)
 
         if keys_pressed[pygame.K_d]:
-            if keys_pressed[pygame.K_s] or keys_pressed[pygame.K_w]:
-                self.f_x += self.velocity / 2
-            else:
-                self.f_x += self.velocity
+            self.f_x += self.velocity
 
             self.last_direction = 'd'
             self.animate('d', tick)
@@ -168,3 +161,9 @@ class Player(pygame.sprite.Sprite):
     def get_loc(self):
         player_location = (self.f_x, self.f_y)
         return player_location
+
+    def decrease_health(self):
+        self.health -= 1
+
+    def increase_health(self):
+        self.health += 1
